@@ -7,18 +7,12 @@ class cdp_sim(bt.Strategy):
 
     params = dict(
         verbose=True,
-        a_upper = 2.2,
-        a_lower = 1.8,
-        a_target = 2,
-        na_upper = 3.5,
-        na_lower = 2.5,
-        na_target = 3,
-        period=20,
+        a_upper = 3.5,
+        a_lower = 2.5,
+        a_target = 3,
     )
     def __init__(self):
-        ##set up indicators add stop trailer and cross condition for stochasticsubmit(False)
-        # self.RSI = btind.RSI(period=self.p.period)
-        self.sma = btind.SMA(period=self.p.period)
+        pass
 
     def start(self):
         self.debt = 0
@@ -36,25 +30,18 @@ class cdp_sim(bt.Strategy):
         return self.usd_pos/self.debt if self.debt else 0
     def boost(self):
         coll_before = self.usd_pos
-        # x = (coll_before - self.target * self.debt)/(self.target-1)
         x = (coll_before - self.target * self.debt)/(self.target)
         self.debt += x
         self.buy(size=x/self.price)
     def repay(self):
         coll_before = self.usd_pos
-        # x = (coll_before - self.target * self.debt)/(self.target+1)*-1
         x = (coll_before - self.target * self.debt)/(self.target)*-1
         self.debt -= x
         self.sell(size=x/self.price)
     def set_ratios(self):
-        if self.data > self.sma:
-            self.target = self.p.a_target
-            self.lower = self.p.a_lower
-            self.upper = self.p.a_upper
-        else:
-            self.target = self.p.na_target
-            self.lower = self.p.na_lower
-            self.upper = self.p.na_upper
+        self.target = self.p.a_target
+        self.lower = self.p.a_lower
+        self.upper = self.p.a_upper
     def stop(self):
         self.stop_val = self.usd_pos
         self.pnl_val = self.usd_pos - self.start_val
@@ -98,10 +85,30 @@ class cdp_sim(bt.Strategy):
             out = [self.datetime.date().isoformat(), txt.format(*args)]
             print(','.join(out))
 
+class cdp_sim_ma(cdp_sim):
+    params = dict(
+        na_upper=3.5,
+        na_lower=2.5,
+        na_target=3,
+        period = 20
+    )
+
+    def __init__(self):
+        self.ma = btind.SMA(period=self.p.period)
+
+    def set_ratios(self):
+        if self.price > self.ma:
+            self.target = self.p.a_target
+            self.lower = self.p.a_lower
+            self.upper = self.p.a_upper
+        else:
+            self.target = self.p.na_target
+            self.lower = self.p.na_lower
+            self.upper = self.p.na_upper
 
 if __name__ == '__main__':
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(cdp_sim)
+    cerebro.addstrategy(cdp_sim_ma)
     cerebro.broker.setcash(1000000000000000000000000000000)
     cerebro.adddata(bt.feeds.PandasData(dataname=ccxt_datahandler('ETH/USDT', 'poloniex', '1d')))
     strat = cerebro.run()[0]

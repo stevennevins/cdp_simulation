@@ -4,13 +4,21 @@ import dash_html_components as html
 
 import plotly.graph_objects as go
 
-from cdp import cdp_sim, bt, ccxt_datahandler
+from cdp import cdp_sim, bt, ccxt_datahandler, cdp_sim_ma
 from analyzers import coll_ratio, amt_eth
 
 pairs = 'BTC/USDT','ETH/USDT'
-def run_sim(strat, pair, exchange, tf):
+strats = {'CDP':cdp_sim,
+'CDP MA':cdp_sim_ma}
+timeframes = {'1d':'1d'}
+def run_sim(strat, pair, exchange, tf,args):
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(strat,verbose=False)
+    print(args)
+    if strat == 'CDP':
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3],a_lower=args[1],a_target=args[2])
+    elif strat == 'CDP MA':
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3],a_lower=args[1],a_target=args[2],period=args[0],na_lower=args[4],na_target=args[5],na_upper=args[6])
+        #,period=args[],a_upper=,a_lower=,a_target=
     cerebro.broker.setcash(1000000000000000000000000000000)
     cerebro.adddata(bt.feeds.PandasData(dataname=ccxt_datahandler(pair, exchange, tf)))
     cerebro.addanalyzer(amt_eth, _name='amt_eth')
@@ -24,22 +32,22 @@ def return_go(sim):
     trace1 = go.Scatter(
         x=amt[0],
         y=amt[1],
-        name='Amount of ETH',
-        mode='lines+markers',
+        name='#Asset',
+        mode='lines',
         yaxis='y1'
     )
     trace2 = go.Scatter(
         x=col_rat[0],
         y=col_rat[1],
         name='Collateralization Ratio',
-        mode='lines+markers',
-        yaxis='y2'
+        mode='markers',
+        yaxis='y2',
     )
     data = [trace1,trace2]
     layout= go.Layout(
         title='CDP Simulation',
-        yaxis = dict(title='Amount of Asset'),
-        yaxis2 = dict(title='Collateralization Ratio',overlaying='y',side='right')
+        yaxis = dict(title='Amount of Asset',type='log'),
+        yaxis2 = dict(title='Collateralization Ratio',overlaying='y',side='right',range=[col_rat[1].nsmallest(2).iloc[-1]*.9,max(col_rat[1])*1.1])
         )
     fig = go.Figure(data=data,layout=layout)
     return dcc.Graph(id='sim_results',figure=fig)
@@ -55,6 +63,32 @@ home_page = dbc.Jumbotron(
                     value='ETH/USDT',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
+                dcc.Dropdown(
+                    id='strat-dd',
+                    options = [{'label': i, 'value': i} for i,v in strats.items()],
+                    value='CDP MA',
+                    style={'display':'inline-block','width':'7.5rem'}
+                ),
+                dcc.Dropdown(
+                    id='tf-dd',
+                    options = [{'label': i, 'value': i} for i,v in timeframes.items()],
+                    value='1d',
+                    style={'display':'inline-block','width':'7.5rem'}
+                ),
+                html.P('Period: ',style={'display':'inline-block'}),
+                dcc.Input(id='period-input',type='number',value=20,style={'display':'inline-block','width':'4rem'}),
+                html.P('Risky Lower: ',style={'display':'inline-block'}),
+                dcc.Input(id='R_L-input',type='number',value=180,style={'display':'inline-block','width':'4rem'}),
+                html.P('Riksy Target: ',style={'display':'inline-block'}),
+                dcc.Input(id='R_T-input',type='number',value=200,style={'display':'inline-block','width':'4rem'}),
+                html.P('Risky Upper: ',style={'display':'inline-block'}),
+                dcc.Input(id='R_U-input',type='number',value=220,style={'display':'inline-block','width':'4rem'}),
+                html.P('Less Risky Lower: ',style={'display':'inline-block'}),
+                dcc.Input(id='NR_L-input',type='number',value=250,style={'display':'inline-block','width':'4rem'}),
+                html.P('Less Risky Target: ',style={'display':'inline-block'}),
+                dcc.Input(id='NR_T-input',type='number',value=300,style={'display':'inline-block','width':'4rem'}),
+                html.P('Less Risky Upper: ',style={'display':'inline-block'}),
+                dcc.Input(id='NR_U-input',type='number',value=350,style={'display':'inline-block','width':'4rem'}),
                 dcc.Loading(id='graph-content')
             ],
             fluid=True,

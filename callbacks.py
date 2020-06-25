@@ -2,9 +2,9 @@ from dash.dependencies import Input, Output, State
 from app import app
 from layouts import DIRECTORY, page_not_found
 
-from pages.home import run_sim, cdp_sim, return_go
+from pages.home import run_sim, cdp_sim, return_go,cdp_sim_ma,pairs
 
-
+input_list = ['pairs-dd','strat-dd','tf-dd','period-input','R_L-input','R_T-input','R_U-input','NR_L-input','NR_T-input','NR_U-input']
 @app.callback(
     [Output(f"{x}", "active") for x in DIRECTORY], [Input("url", "pathname")],
 )
@@ -38,9 +38,10 @@ def toggle_collapse(n_clicks, is_open):
 
 @app.callback(
     Output('graph-content','children'),
-    [Input('pairs-dd','value')]
+    [Input(_,'value') for _ in input_list]
 )
-def return_graph(value):
-    sim = run_sim(strat=cdp_sim, pair=value, exchange='poloniex', tf='1d')
+def return_graph(*args):
+    print(args[0])
+    sim = run_sim(strat=args[1], pair=args[0], exchange='poloniex', tf=args[2],args=args[3:])
     
     return return_go(sim)

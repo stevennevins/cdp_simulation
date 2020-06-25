@@ -13,11 +13,12 @@ class cdp_sim(bt.Strategy):
         na_upper = 3.5,
         na_lower = 2.5,
         na_target = 3,
-        period=14,
+        period=20,
     )
     def __init__(self):
         ##set up indicators add stop trailer and cross condition for stochasticsubmit(False)
-        self.RSI = btind.RSI(period=self.p.period)
+        # self.RSI = btind.RSI(period=self.p.period)
+        self.sma = btind.SMA(period=self.p.period)
 
     def start(self):
         self.debt = 0
@@ -35,17 +36,18 @@ class cdp_sim(bt.Strategy):
         return self.usd_pos/self.debt if self.debt else 0
     def boost(self):
         coll_before = self.usd_pos
-        x = (coll_before - self.target * self.debt)/(self.target-1)
+        # x = (coll_before - self.target * self.debt)/(self.target-1)
+        x = (coll_before - self.target * self.debt)/(self.target)
         self.debt += x
         self.buy(size=x/self.price)
     def repay(self):
         coll_before = self.usd_pos
-        x = (coll_before - self.target * self.debt)/(self.target)*-1
         # x = (coll_before - self.target * self.debt)/(self.target+1)*-1
+        x = (coll_before - self.target * self.debt)/(self.target)*-1
         self.debt -= x
         self.sell(size=x/self.price)
     def set_ratios(self):
-        if self.RSI > 60:
+        if self.data > self.sma:
             self.target = self.p.a_target
             self.lower = self.p.a_lower
             self.upper = self.p.a_upper

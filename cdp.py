@@ -40,7 +40,8 @@ class cdp_sim(bt.Strategy):
         self.buy(size=x/self.price)
     def repay(self):
         coll_before = self.usd_pos
-        x = (coll_before - self.target * self.debt)/(self.target+1)*-1
+        x = (coll_before - self.target * self.debt)/(self.target)*-1
+        # x = (coll_before - self.target * self.debt)/(self.target+1)*-1
         self.debt -= x
         self.sell(size=x/self.price)
     def set_ratios(self):

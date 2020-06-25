@@ -15,9 +15,9 @@ def run_sim(strat, pair, exchange, tf,args):
     cerebro = bt.Cerebro()
     print(args)
     if strat == 'CDP':
-        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3],a_lower=args[1],a_target=args[2])
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3]/100,a_lower=args[1]/100,a_target=args[2]/100)
     elif strat == 'CDP MA':
-        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3],a_lower=args[1],a_target=args[2],period=args[0],na_lower=args[4],na_target=args[5],na_upper=args[6])
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3]/100,a_lower=args[1]/100,a_target=args[2]/100,period=args[0],na_lower=args[4]/100,na_target=args[5]/100,na_upper=args[6]/100)
         #,period=args[],a_upper=,a_lower=,a_target=
     cerebro.broker.setcash(1000000000000000000000000000000)
     cerebro.adddata(bt.feeds.PandasData(dataname=ccxt_datahandler(pair, exchange, tf)))

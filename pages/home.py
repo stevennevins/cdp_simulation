@@ -75,19 +75,19 @@ home_page = dbc.Jumbotron(
                     value='1d',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
-                html.P('Period: ',style={'display':'inline-block'}),
+                html.P(id='period-text',children='Period: ',style={'display':'inline-block'}),
                 dcc.Input(id='period-input',type='number',value=20,style={'display':'inline-block','width':'4rem'}),
-                html.P('Risky Lower: ',style={'display':'inline-block'}),
+                html.P(id='R_L-text',children='Risky Lower: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_L-input',type='number',value=180,style={'display':'inline-block','width':'4rem'}),
-                html.P('Riksy Target: ',style={'display':'inline-block'}),
+                html.P(id='R_T-text',children='Riksy Target: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_T-input',type='number',value=200,style={'display':'inline-block','width':'4rem'}),
-                html.P('Risky Upper: ',style={'display':'inline-block'}),
+                html.P(id='R_U-text',children='Risky Upper: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_U-input',type='number',value=220,style={'display':'inline-block','width':'4rem'}),
-                html.P('Less Risky Lower: ',style={'display':'inline-block'}),
+                html.P(id='NR_L-text',children='Less Risky Lower: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_L-input',type='number',value=250,style={'display':'inline-block','width':'4rem'}),
-                html.P('Less Risky Target: ',style={'display':'inline-block'}),
+                html.P(id='NR_T-text',children='Less Risky Target: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_T-input',type='number',value=300,style={'display':'inline-block','width':'4rem'}),
-                html.P('Less Risky Upper: ',style={'display':'inline-block'}),
+                html.P(id = 'NR_U-text',children='Less Risky Upper: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_U-input',type='number',value=350,style={'display':'inline-block','width':'4rem'}),
                 dcc.Loading(id='graph-content')
             ],
@@ -95,3 +95,4 @@ home_page = dbc.Jumbotron(
         )
     ],
 )
+input_ids = ['period-text','period-input','R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input','NR_L-text','NR_L-input','NR_T-text','NR_T-input','NR_U-text','NR_U-input']

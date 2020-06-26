@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State
 from app import app
 from layouts import DIRECTORY, page_not_found
 
-from pages.home import run_sim, cdp_sim, return_go,cdp_sim_ma,pairs
+from pages.home import run_sim, cdp_sim, return_go,cdp_sim_ma,pairs,input_ids
 
 input_list = ['pairs-dd','strat-dd','tf-dd','period-input','R_L-input','R_T-input','R_U-input','NR_L-input','NR_T-input','NR_U-input']
 @app.callback(
@@ -42,6 +42,14 @@ def toggle_collapse(n_clicks, is_open):
 )
 def return_graph(*args):
     print(args[0])
-    sim = run_sim(strat=args[1], pair=args[0], exchange='poloniex', tf=args[2],args=args[3:])
-    
+    sim = run_sim(strat=args[1], pair=args[0], exchange='poloniex', tf=args[2],args=args[3:])   
     return return_go(sim)
+
+@app.callback(
+    [Output(_id,'style') for _id in input_ids],
+    [Input('strat-dd','value')]
+)
+def input_toggles(value):
+    ans = {'CDP':['R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input'],
+    'CDP MA':input_ids}
+    return [{'display':'inline'} if x in ans[value] else {'display':'none','width':'3rem'} for x in input_ids]

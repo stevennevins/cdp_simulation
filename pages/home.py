@@ -57,18 +57,21 @@ home_page = dbc.Jumbotron(
         dbc.Container(
             children=[
                 html.H1("CDP Simulator", className="strong"),
+                html.P('Pairs:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='pairs-dd',
                     options=[{'label': i, 'value': i} for i in pairs],
                     value='ETH/USDT',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
+                html.P('Strategies:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='strat-dd',
                     options = [{'label': i, 'value': i} for i,v in strats.items()],
                     value='CDP MA',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
+                html.P('Timeframe:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='tf-dd',
                     options = [{'label': i, 'value': i} for i,v in timeframes.items()],

@@ -78,6 +78,7 @@ home_page = dbc.Jumbotron(
                     value='1d',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
+                html.Br(),
                 html.P(id='period-text',children='Period: ',style={'display':'inline-block'}),
                 dcc.Input(id='period-input',type='number',value=20,style={'display':'inline-block','width':'4rem'}),
                 html.P(id='R_L-text',children='Risky Repay %: ',style={'display':'inline-block'}),
@@ -86,12 +87,14 @@ home_page = dbc.Jumbotron(
                 dcc.Input(id='R_T-input',type='number',value=200,style={'display':'inline-block','width':'4rem'}),
                 html.P(id='R_U-text',children='Risky Boost %: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_U-input',type='number',value=220,style={'display':'inline-block','width':'4rem'}),
+                html.Br(),
                 html.P(id='NR_L-text',children='Less Risky Repay%: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_L-input',type='number',value=250,style={'display':'inline-block','width':'4rem'}),
                 html.P(id='NR_T-text',children='Less Risky Target: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_T-input',type='number',value=300,style={'display':'inline-block','width':'4rem'}),
                 html.P(id = 'NR_U-text',children='Less Risky Boost %: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_U-input',type='number',value=350,style={'display':'inline-block','width':'4rem'}),
+                html.Br(),
                 dcc.Loading(id='graph-content')
             ],
             fluid=True,

@@ -28,7 +28,7 @@ navbar = dbc.Navbar(
                         dbc.Col(html.Img(src="", height="30px")),
                         dbc.Col(
                             dbc.NavbarBrand(
-                                "TokenSets Tracker", className="ml-2 strong"
+                                "CDP Sim", className="ml-2 strong"
                             )
                         ),
                     ],

@@ -1,7 +1,7 @@
 import backtrader as bt
 import backtrader.indicators as btind
 
-from ccxt_datahandler import ccxt_datahandler
+from services.ccxt_datahandler import ccxt_datahandler
 
 class cdp_sim(bt.Strategy):
 

@@ -4,8 +4,8 @@ import dash_html_components as html
 
 import plotly.graph_objects as go
 
-from cdp import cdp_sim, bt, ccxt_datahandler, cdp_sim_ma
-from analyzers import coll_ratio, amt_eth
+from context.cdp import cdp_sim, bt, ccxt_datahandler, cdp_sim_ma
+from context.analyzers import coll_ratio, amt_eth
 
 pairs = 'BTC/USDT','ETH/USDT'
 strats = {'CDP':cdp_sim,

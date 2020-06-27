@@ -35,7 +35,7 @@ class amt_eth(Analyzer):
         self.amt_eth = dict()
 
     def next(self):
-        self.amt_eth[self.data.datetime.datetime()]=self.strategy.broker.getposition(self.data).size
+        self.amt_eth[self.data.datetime.datetime()]=self.strategy.broker.getposition(self.data).size - self.strategy.debt/self.strategy.price
 
     def stop(self):
         self.rets.amt_eth = pd.DataFrame(self.amt_eth.items())

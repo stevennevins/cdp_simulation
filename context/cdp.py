@@ -114,17 +114,15 @@ class cdp_sim_d_dca(cdp_sim):
     def next(self):
         self.logdata()
         self.set_ratios()
+        if not self.coll_ratio:
+            ##initializing position
+            self.start_val = 0
         if len(self.data)%self.p.period==0:
             if self.debt > self.p.dca_amt:
                 self.debt -= self.p.dca_amt
             else:
                 self.buy(size=self.p.dca_amt/self.price)
-        if not self.coll_ratio:
-            ##initializing position
-            self.buy(size=10)
-            self.debt = self.data * 10 / self.target
-            self.start_val = self.data*10
-        elif self.coll_ratio > self.upper:
+        if self.coll_ratio > self.upper:
             self.boost()
         elif self.coll_ratio < self.lower:
             self.repay()
@@ -137,14 +135,11 @@ class cdp_sim_c_dca(cdp_sim):
     def next(self):
         self.logdata()
         self.set_ratios()
+        if not self.coll_ratio:
+            self.start_val = 0
         if len(self.data)%self.p.period==0:
             self.buy(size=self.p.dca_amt/self.price)
-        if not self.coll_ratio:
-            ##initializing position
-            self.buy(size=10)
-            self.debt = self.data * 10 / self.target
-            self.start_val = self.data*10
-        elif self.coll_ratio > self.upper:
+        if self.coll_ratio > self.upper:
             self.boost()
         elif self.coll_ratio < self.lower:
             self.repay()

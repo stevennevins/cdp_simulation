@@ -106,9 +106,51 @@ class cdp_sim_ma(cdp_sim):
             self.lower = self.p.na_lower
             self.upper = self.p.na_upper
 
+class cdp_sim_d_dca(cdp_sim):
+    params = dict(
+        period=7,
+        dca_amt=100
+    )
+    def next(self):
+        self.logdata()
+        self.set_ratios()
+        if len(self.data)%self.p.period==0:
+            if self.debt > self.p.dca_amt:
+                self.debt -= self.p.dca_amt
+            else:
+                self.buy(size=self.p.dca_amt/self.price)
+        if not self.coll_ratio:
+            ##initializing position
+            self.buy(size=10)
+            self.debt = self.data * 10 / self.target
+            self.start_val = self.data*10
+        elif self.coll_ratio > self.upper:
+            self.boost()
+        elif self.coll_ratio < self.lower:
+            self.repay()
+
+class cdp_sim_c_dca(cdp_sim):
+    params = dict(
+        period=7,
+        dca_amt=100
+    )
+    def next(self):
+        self.logdata()
+        self.set_ratios()
+        if len(self.data)%self.p.period==0:
+            self.buy(size=self.p.dca_amt/self.price)
+        if not self.coll_ratio:
+            ##initializing position
+            self.buy(size=10)
+            self.debt = self.data * 10 / self.target
+            self.start_val = self.data*10
+        elif self.coll_ratio > self.upper:
+            self.boost()
+        elif self.coll_ratio < self.lower:
+            self.repay()
 if __name__ == '__main__':
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(cdp_sim_ma)
+    cerebro.addstrategy(cdp_sim_d_dca)
     cerebro.broker.setcash(1000000000000000000000000000000)
     cerebro.adddata(bt.feeds.PandasData(dataname=ccxt_datahandler('ETH/USDT', 'poloniex', '1d')))
     strat = cerebro.run()[0]

@@ -4,12 +4,16 @@ import dash_html_components as html
 
 import plotly.graph_objects as go
 
-from context.cdp import cdp_sim, bt, ccxt_datahandler, cdp_sim_ma
+from context.cdp import cdp_sim, bt, ccxt_datahandler, cdp_sim_ma, cdp_sim_d_dca, cdp_sim_c_dca
 from context.analyzers import coll_ratio, amt_eth
+
+import pandas as pd
 
 pairs = 'BTC/USDT','ETH/USDT'
 strats = {'CDP':cdp_sim,
-'CDP MA':cdp_sim_ma}
+'CDP MA':cdp_sim_ma,
+'CDP DCA Debt': cdp_sim_d_dca,
+'CDP DCA Collateral': cdp_sim_c_dca}
 timeframes = {'1d':'1d'}
 def run_sim(strat, pair, exchange, tf,args):
     cerebro = bt.Cerebro()
@@ -19,6 +23,10 @@ def run_sim(strat, pair, exchange, tf,args):
     elif strat == 'CDP MA':
         cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3]/100,a_lower=args[1]/100,a_target=args[2]/100,period=args[0],na_lower=args[4]/100,na_target=args[5]/100,na_upper=args[6]/100)
         #,period=args[],a_upper=,a_lower=,a_target=
+    elif strat == 'CDP DCA Debt':
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3]/100,a_lower=args[1]/100,a_target=args[2]/100, period=args[0], dca_amt=args[7])
+    elif strat == 'CDP DCA Collateral':
+        cerebro.addstrategy(strats[strat],verbose=False,a_upper=args[3]/100,a_lower=args[1]/100,a_target=args[2]/100, period=args[0], dca_amt=args[7])
     cerebro.broker.setcash(1000000000000000000000000000000)
     cerebro.adddata(bt.feeds.PandasData(dataname=ccxt_datahandler(pair, exchange, tf)))
     cerebro.addanalyzer(amt_eth, _name='amt_eth')
@@ -57,21 +65,21 @@ home_page = dbc.Jumbotron(
         dbc.Container(
             children=[
                 html.H1("CDP Simulator", className="strong"),
-                html.P('Pairs:',style={'display':'inline-block'}),
+                html.Div('Pairs:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='pairs-dd',
                     options=[{'label': i, 'value': i} for i in pairs],
                     value='ETH/USDT',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
-                html.P('Strategies:',style={'display':'inline-block'}),
+                html.Div('Strategies:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='strat-dd',
                     options = [{'label': i, 'value': i} for i,v in strats.items()],
                     value='CDP MA',
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
-                html.P('Timeframe:',style={'display':'inline-block'}),
+                html.Div('Timeframe:',style={'display':'inline-block'}),
                 dcc.Dropdown(
                     id='tf-dd',
                     options = [{'label': i, 'value': i} for i,v in timeframes.items()],
@@ -79,20 +87,22 @@ home_page = dbc.Jumbotron(
                     style={'display':'inline-block','width':'7.5rem'}
                 ),
                 html.Br(),
-                html.P(id='period-text',children='Period: ',style={'display':'inline-block'}),
+                html.Div(id='period-text',children='Period: ',style={'display':'inline-block'}),
                 dcc.Input(id='period-input',type='number',value=20,style={'display':'inline-block','width':'4rem'}),
+                html.Div(id='dca-text',children='DCA Amount: ',style={'display':'inline-block'}),
+                dcc.Input(id='dca-input',type='number',value=20,style={'display':'inline-block','width':'4rem'}),
                 html.P(id='R_L-text',children='Risky Repay %: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_L-input',type='number',value=180,style={'display':'inline-block','width':'4rem'}),
-                html.P(id='R_T-text',children='Risky Target: ',style={'display':'inline-block'}),
+                html.Div(id='R_T-text',children='Risky Target: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_T-input',type='number',value=200,style={'display':'inline-block','width':'4rem'}),
-                html.P(id='R_U-text',children='Risky Boost %: ',style={'display':'inline-block'}),
+                html.Div(id='R_U-text',children='Risky Boost %: ',style={'display':'inline-block'}),
                 dcc.Input(id='R_U-input',type='number',value=220,style={'display':'inline-block','width':'4rem'}),
                 html.Br(),
-                html.P(id='NR_L-text',children='Less Risky Repay%: ',style={'display':'inline-block'}),
+                html.Div(id='NR_L-text',children='Less Risky Repay%: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_L-input',type='number',value=250,style={'display':'inline-block','width':'4rem'}),
-                html.P(id='NR_T-text',children='Less Risky Target: ',style={'display':'inline-block'}),
+                html.Div(id='NR_T-text',children='Less Risky Target: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_T-input',type='number',value=300,style={'display':'inline-block','width':'4rem'}),
-                html.P(id = 'NR_U-text',children='Less Risky Boost %: ',style={'display':'inline-block'}),
+                html.Div(id = 'NR_U-text',children='Less Risky Boost %: ',style={'display':'inline-block'}),
                 dcc.Input(id='NR_U-input',type='number',value=350,style={'display':'inline-block','width':'4rem'}),
                 html.Br(),
                 dcc.Loading(id='graph-content')
@@ -101,4 +111,4 @@ home_page = dbc.Jumbotron(
         )
     ],
 )
-input_ids = ['period-text','period-input','R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input','NR_L-text','NR_L-input','NR_T-text','NR_T-input','NR_U-text','NR_U-input']
+input_ids = ['period-text','period-input','R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input','NR_L-text','NR_L-input','NR_T-text','NR_T-input','NR_U-text','NR_U-input','dca-input','dca-text']

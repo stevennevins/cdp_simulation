@@ -4,7 +4,7 @@ from layouts import DIRECTORY, page_not_found
 
 from pages.home import run_sim, cdp_sim, return_go,cdp_sim_ma,pairs,input_ids
 
-input_list = ['pairs-dd','strat-dd','tf-dd','period-input','R_L-input','R_T-input','R_U-input','NR_L-input','NR_T-input','NR_U-input']
+input_list = ['pairs-dd','strat-dd','tf-dd','period-input','R_L-input','R_T-input','R_U-input','NR_L-input','NR_T-input','NR_U-input','dca-input']
 @app.callback(
     [Output(f"{x}", "active") for x in DIRECTORY], [Input("url", "pathname")],
 )
@@ -42,6 +42,7 @@ def toggle_collapse(n_clicks, is_open):
 )
 def return_graph(*args):
     print(args[0])
+    print(args)
     sim = run_sim(strat=args[1], pair=args[0], exchange='poloniex', tf=args[2],args=args[3:])   
     return return_go(sim)
 
@@ -51,5 +52,8 @@ def return_graph(*args):
 )
 def input_toggles(value):
     ans = {'CDP':['R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input'],
-    'CDP MA':input_ids}
+    'CDP MA':input_ids[:-2],
+    'CDP DCA Debt':['R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input','period-text','period-input','dca-input','dca-text'],
+    'CDP DCA Collateral':['R_L-text','R_L-input','R_T-text','R_T-input','R_U-text','R_U-input','period-text','period-input','dca-input','dca-text']
+    }
     return [{'display':'inline'} if x in ans[value] else {'display':'none','width':'3rem'} for x in input_ids]
